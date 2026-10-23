@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Furqan Cloud – Bandwidth Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFFFF; --side:#F3FAEA; --main:#FFFFFF; --card:#FFFFFF; --text:#0C342C; --muted:#5F7F73; --line:#E1EDD6; --input:#EFF6E8;
+  --purple:#076653; --purple-d:#0C342C; --soft:#E2FBCE; --on:#FFFFFF; --ink:#06231D; --orange:#C5D61A; --yellow:#9DB81C;
+  --c-iig:#076653; --c-baishan:#D4E321; --c-cdn:#3E9A52; --c-fna:#0C342C; --c-ggc:#A5DC7B; --c-bdix:#1FA38A;
+  --hint-bg:#FFFDDE; --hint-tx:#5E5A06;
+  --shadow:0 6px 24px rgba(7,102,83,.08);
+  color-scheme:light;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#14142a; --side:#181833; --main:#1b1b3a; --card:#222247; --text:#f0f0ff; --muted:#9a9cc4; --line:#2e2e5a; --input:#2c2c58;
+    --purple:#E3EF26; --purple-d:#C9D81C; --soft:#2c2c58; --on:#06231D; --orange:#8FD16B; --yellow:#E3EF26;
+    --c-iig:#3FD1A5; --c-baishan:#E3EF26; --c-cdn:#7CCB5A; --c-fna:#B9F08A; --c-ggc:#1FA38A; --c-bdix:#E2FBCE;
+    --hint-bg:rgba(227,239,38,.12); --hint-tx:#E3EF26;
+    --shadow:0 6px 24px rgba(0,0,0,.3); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14142a; --side:#181833; --main:#1b1b3a; --card:#222247; --text:#f0f0ff; --muted:#9a9cc4; --line:#2e2e5a; --input:#2c2c58;
+  --purple:#E3EF26; --purple-d:#C9D81C; --soft:#2c2c58; --on:#06231D; --orange:#8FD16B; --yellow:#E3EF26;
+  --c-iig:#3FD1A5; --c-baishan:#E3EF26; --c-cdn:#7CCB5A; --c-fna:#B9F08A; --c-ggc:#1FA38A; --c-bdix:#E2FBCE;
+  --hint-bg:rgba(227,239,38,.12); --hint-tx:#E3EF26;
+  --shadow:0 6px 24px rgba(0,0,0,.3); color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Poppins','Hind Siliguri',system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+svg{display:block}
+:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
+
+.app{display:grid;grid-template-columns:230px minmax(0,1fr) 330px;min-height:100vh}
+.side{background:var(--side);padding:28px 20px;display:flex;flex-direction:column;gap:28px;position:sticky;top:0;height:100vh;align-self:start}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:20px;letter-spacing:-.2px}
+.brand small{display:block;font-size:11px;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:-4px}
+.nav{display:flex;flex-direction:column;gap:6px}
+.nav button{display:flex;align-items:center;gap:14px;border:0;background:none;padding:12px 14px;border-radius:10px;color:var(--muted);font-weight:500;font-size:14px;cursor:pointer;text-align:left;position:relative}
+.nav button:hover{background:var(--soft);color:var(--purple)}
+.nav button.on{color:var(--purple)}
+.nav button.on::after{content:"";position:absolute;right:-20px;top:8px;bottom:8px;width:4px;border-radius:4px 0 0 4px;background:var(--purple)}
+.promo{margin-top:auto;background:var(--purple);color:var(--on);border-radius:16px;padding:20px 16px;position:relative;overflow:hidden}
+.promo::before{content:"";position:absolute;right:-30px;top:-30px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.1)}
+.promo::after{content:"";position:absolute;left:-20px;bottom:-40px;width:90px;height:90px;border-radius:50%;background:var(--orange);opacity:.35}
+.promo h4{margin:0 0 4px;font-size:15px;position:relative;z-index:1}
+.promo p{margin:0;font-size:12.5px;opacity:.85;line-height:1.55;position:relative;z-index:1}
+
+.main{padding:28px 28px 20px;min-width:0;background:var(--main)}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:22px}
+.head h1{margin:0;font-size:26px;font-weight:600;letter-spacing:-.4px}
+.head p{margin:4px 0 0;color:var(--muted);font-size:13.5px}
+.mbrand{display:none}
+.themeBtn{flex:none;display:inline-flex;align-items:center;gap:8px;border:0;background:var(--soft);color:var(--purple);padding:10px 14px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer}
+.themeBtn:hover{background:var(--purple);color:var(--on)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:var(--shadow);margin-bottom:20px}
+.card h2{margin:0 0 4px;font-size:17px;font-weight:600}
+.card .note{margin:0 0 16px;font-size:12.5px;color:var(--muted)}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:20px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.stat span.l{font-size:13px;color:var(--muted)}
+.stat b{display:block;font-size:30px;font-weight:600;line-height:1.2;margin-top:2px;font-variant-numeric:tabular-nums}
+.stat b em{font-style:normal;font-size:13px;font-weight:500;color:var(--muted);margin-left:4px}
+.ring{width:62px;height:62px;flex:none;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring i{position:absolute;inset:0;display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:600}
+
+.tog{display:flex;flex-wrap:wrap;gap:12px 22px}
+.sw{display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13.5px;font-weight:500;user-select:none}
+.sw input{position:absolute;opacity:0;width:0;height:0}
+.sw .t{width:34px;height:20px;border-radius:20px;background:var(--line);position:relative;transition:background .2s;flex:none}
+.sw .t::after{content:"";position:absolute;left:3px;top:3px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+.sw input:checked+.t{background:var(--c)}
+.sw input:checked+.t::after{transform:translateX(14px)}
+.sw input:focus-visible+.t{outline:3px solid var(--purple);outline-offset:2px}
+.hint{margin-top:16px;display:flex;gap:10px;align-items:center;background:var(--hint-bg);color:var(--hint-tx);border-radius:10px;padding:10px 14px;font-size:13px}
+
+.duo{display:grid;grid-template-columns:1.25fr .75fr;gap:20px}
+.duo .card{margin-bottom:0}
+.row{display:grid;grid-template-columns:78px minmax(0,1fr) auto;align-items:center;gap:14px;padding:11px 0;border-bottom:1px solid var(--line)}
+.row:last-of-type{border-bottom:0}
+.row strong{font-size:14px;font-weight:600}
+.bar{height:8px;border-radius:8px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:8px;width:0;transition:width .35s ease}
+.step{display:flex;align-items:center;background:var(--input);border-radius:10px;padding:3px}
+.step button{width:30px;height:30px;border:0;border-radius:8px;background:var(--card);cursor:pointer;display:grid;place-items:center;color:var(--purple);box-shadow:0 1px 3px rgba(7,102,83,.18)}
+.step button:hover{background:var(--purple);color:var(--on)}
+.step input{width:62px;border:0;background:transparent;text-align:center;font:600 14px 'Poppins',sans-serif;color:var(--text);-moz-appearance:textfield}
+.step input::-webkit-outer-spin-button,.step input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.step input:focus{outline:none}
+.buffer{margin-top:16px;background:var(--soft);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.buffer label{font-size:13px;font-weight:500}
+.buffer label small{display:block;color:var(--muted);font-weight:400;font-size:12px}
+.buffer .step{background:var(--card)}
+
+.donutWrap{display:grid;place-items:center;margin:6px 0 16px;position:relative}
+.donutWrap svg{width:190px;height:190px;transform:rotate(-90deg)}
+.donutC{position:absolute;text-align:center}
+.donutC b{display:block;font-size:26px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.donutC span{font-size:12px;color:var(--muted)}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;font-size:12.5px}
+.legend div{display:flex;align-items:center;gap:7px}
+.dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--c)}
+
+.panel{padding:28px 24px;display:flex;flex-direction:column;gap:18px;background:var(--side);position:sticky;top:0;height:100vh;align-self:start;overflow:auto}
+.panel h3{margin:0;font-size:17px;font-weight:600}
+.res{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;padding:11px 0;border-bottom:1px solid var(--line);align-items:center}
+.res .n{display:flex;align-items:center;gap:9px;font-size:13.5px}
+.res .v{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.res .v small{font-weight:400;color:var(--muted)}
+.res .bar{grid-column:1/-1;height:5px}
+.res.off{opacity:.45}
+.big{border-radius:14px;padding:16px 18px;color:#fff;display:flex;align-items:center;gap:14px}
+.big.o{background:linear-gradient(135deg,#E3EF26,#B9CC1A);color:var(--ink)}
+.big.o .tile{background:rgba(6,35,29,.12)}
+.big.p{background:linear-gradient(135deg,#076653,#0C342C)}
+.big .tile{width:50px;height:50px;border-radius:10px;background:rgba(255,255,255,.2);display:grid;place-items:center;flex:none}
+.big small{display:block;font-size:12.5px;opacity:.85}
+.big b{font-size:24px;font-weight:600;line-height:1.2;font-variant-numeric:tabular-nums}
+.big b em{font-style:normal;font-size:13px;font-weight:500;margin-left:4px;opacity:.85}
+.fbn{font-size:12px;color:var(--muted);text-align:center;background:var(--input);border-radius:8px;padding:8px}
+.btns{display:flex;gap:10px;margin-top:auto}
+.btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 14px;border-radius:10px;border:0;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s}
+.btn.pri{background:var(--purple);color:var(--on);box-shadow:0 6px 16px rgba(7,102,83,.3)}
+.btn.pri:hover{background:var(--purple-d)}
+.btn.gho{background:var(--soft);color:var(--purple)}
+.btn.gho:hover{background:var(--purple);color:var(--on)}
+.btn.warn{background:var(--orange);color:var(--ink)}
+
+.foot{grid-column:1/-1;text-align:center;padding:16px;font-size:12.5px;color:var(--muted);background:var(--card);border-top:1px solid var(--line)}
+.foot b{color:var(--purple);font-weight:600}
+.toast{position:fixed;left:50%;bottom:calc(28px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--purple);color:var(--on);padding:10px 22px;border-radius:40px;font-size:14px;font-weight:500;box-shadow:0 10px 25px rgba(7,102,83,.3);opacity:0;visibility:hidden;transition:all .3s;z-index:20}
+.toast.show{opacity:1;visibility:visible;transform:translate(-50%,0)}
+
+@media (max-width:1180px){
+  .app{grid-template-columns:minmax(0,1fr) 320px}
+  .side{display:none}
+  .mbrand{display:flex}
+}
+@media (max-width:860px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .panel{position:static;height:auto;overflow:visible}
+  .stats{grid-template-columns:1fr}
+  .duo{grid-template-columns:1fr}
+  .duo .card{margin-bottom:20px}
+  .main{padding:20px 16px 8px}
+  .head{gap:8px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="side">
+    <div class="brand" id="logoSide"></div>
+    <nav class="nav">
+      <button class="on" data-go="top">Calculator</button>
+      <button data-go="services">Services</button>
+      <button data-go="packages">Packages</button>
+      <button data-go="results">Results</button>
+    </nav>
+    <div class="promo">
+      <h4>আনুমানিক হিসাব</h4>
+      <p>এই টুলস ১০০% সঠিক নাও হতে পারে। এটি শুধু আনুমানিক ধারণা দেয়।</p>
+    </div>
+  </aside>
+
+  <main class="main" id="top">
+    <header class="head">
+      <div>
+        <div class="brand mbrand" id="logoTop" style="margin-bottom:14px"></div>
+        <h1>Bandwidth Calculator</h1>
+        <p>Bandwidth estimation tool for ISP business</p>
+      </div>
+      <button class="themeBtn" id="themeBtn" type="button"></button>
+    </header>
+
+    <section class="stats">
+      <div class="stat"><div><span class="l">Total Subscribers</span><b id="sUsers">0</b></div>
+        <div class="ring"><svg viewBox="0 0 36 36" width="62" height="62"><circle cx="18" cy="18" r="15.5" fill="none" stroke="var(--line)" stroke-width="3.5"/><circle id="ringU" cx="18" cy="18" r="15.5" fill="none" stroke="var(--purple)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="0 100" pathLength="100"/></svg><i id="ringUt">0</i></div></div>
+      <div class="stat"><div><span class="l">Total Required</span><b><span id="sTotal">0.00</span><em>Mbps</em></b></div>
+        <div class="ring"><svg viewBox="0 0 36 36" width="62" height="62"><circle cx="18" cy="18" r="15.5" fill="none" stroke="var(--line)" stroke-width="3.5"/><circle id="ringT" cx="18" cy="18" r="15.5" fill="none" stroke="var(--yellow)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="0 100" pathLength="100"/></svg><i id="ringTt">0%</i></div></div>
+      <div class="stat"><div><span class="l">CDN/Baishan → IIG</span><b><span id="sFb">0.00</span><em>Mbps</em></b></div>
+        <div class="ring"><svg viewBox="0 0 36 36" width="62" height="62"><circle cx="18" cy="18" r="15.5" fill="none" stroke="var(--line)" stroke-width="3.5"/><circle id="ringF" cx="18" cy="18" r="15.5" fill="none" stroke="var(--orange)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="0 100" pathLength="100"/></svg><i id="ringFt">0%</i></div></div>
+    </section>
+
+    <section class="card" id="services">
+      <h2>Services to Buy</h2>
+      <p class="note">মার্ক করুন যা কিনবেন</p>
+      <div class="tog" id="tog"></div>
+      <div class="hint">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        <span>CDN বা Baishan আন-টিক করলে তা অটোমেটিক IIG তে যোগ হবে।</span>
+      </div>
+    </section>
+
+    <div class="duo">
+      <section class="card" id="packages">
+        <h2>Users per Package</h2>
+        <p class="note">প্রতিটি প্যাকেজে কতজন ইউজার</p>
+        <div id="pkgRows"></div>
+        <div class="buffer">
+          <label for="extraPct">Extra Buffer (%)<small>আনুমানিক 5–10%</small></label>
+          <div class="step">
+            <button type="button" data-b="-1" aria-label="Decrease buffer"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M5 11h14v2H5z"/></svg></button>
+            <input id="extraPct" type="number" inputmode="decimal" value="0" min="0" step="1">
+            <button type="button" data-b="1" aria-label="Increase buffer"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Bandwidth Split</h2>
+        <p class="note">সার্ভিস অনুযায়ী ভাগ</p>
+        <div class="donutWrap">
+          <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="48" fill="none" stroke="var(--line)" stroke-width="14"/><g id="segs"></g></svg>
+          <div class="donutC"><b id="dTotal">0</b><span>Mbps total</span></div>
+        </div>
+        <div class="legend" id="legend"></div>
+      </section>
+    </div>
+  </main>
+
+  <aside class="panel" id="results">
+    <h3>Required Bandwidth</h3>
+    <div id="resList"></div>
+    <div class="big o"><div class="tile"><svg width="24" height="24" viewBox="0 0 24 24" fill="#06231D"><path d="M3 13h4v8H3zm7-6h4v14h-4zm7-4h4v18h-4z"/></svg></div><div><small>Total Required</small><b><span id="rTotal">0.00</span><em>Mbps</em></b></div></div>
+    <div class="big p"><div class="tile"><svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M16 11a4 4 0 10-4-4 4 4 0 004 4zM8 12a3 3 0 10-3-3 3 3 0 003 3zm8 2c-2.7 0-8 1.3-8 4v2h16v-2c0-2.7-5.3-4-8-4zM8 14c-.3 0-.6 0-1 .1C5.2 14.4 2 15.4 2 17.5V20h5v-2c0-1.4.7-2.6 1.8-3.5A9 9 0 008 14z"/></svg></div><div><small>Total Subscribers</small><b id="totalUsers">0</b></div></div>
+    <div class="fbn">CDN/Baishan → IIG: <span id="fallbackToIIG">0.00</span> Mbps</div>
+    <div class="btns">
+      <button class="btn gho" id="btnReset" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V2L7 6l5 4V7a5 5 0 11-5 5H5a7 7 0 107-7z"/></svg><span>Reset</span></button>
+      <button class="btn pri" id="btnCopy" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11z"/></svg><span>Copy Report</span></button>
+    </div>
+  </aside>
+
+  <footer class="foot">© 2026 <b>Furqan Cloud</b>. All rights reserved.</footer>
+</div>
+<div id="toast" class="toast" role="status"></div>
+
+<script>
+(function(){
+  var PACKAGES=[20,30,40,50,70,80,100,150,200];
+  var CATS=["IIG","Baishan","CDN","FNA","GGC","BDIX"];
+  var AVG={IIG:0.33,Baishan:0.32,CDN:0.07,FNA:0.56,GGC:1.01,BDIX:0.052};
+  var FALLBACK={CDN:1,Baishan:1};
+  var COL={IIG:"var(--c-iig)",Baishan:"var(--c-baishan)",CDN:"var(--c-cdn)",FNA:"var(--c-fna)",GGC:"var(--c-ggc)",BDIX:"var(--c-bdix)"};
+  var PKGCOL=["#076653","#1FA38A","#3E9A52","#6FBF4E","#A5DC7B","#D4E321","#2B7F6B","#58C29A","#B7C816"];
+  var KEY="furqanBwCalc";
+  var n=function(v){var x=parseFloat(v);return isFinite(x)?x:0};
+  var fmt=function(v){return (Math.round(v*100)/100).toFixed(2)};
+  var $=function(id){return document.getElementById(id)};
+  var LOGO='<svg width="34" height="34" viewBox="0 0 40 40"><path d="M20 20V3a17 17 0 0117 17z" fill="#076653"/><path d="M20 20h17a17 17 0 01-17 17z" fill="#E3EF26"/><path d="M20 20v17A17 17 0 013 20z" fill="#3E9A52"/><path d="M20 20H3A17 17 0 0120 3z" fill="#8FD16B"/></svg><div>Furqan Cloud<small>Bandwidth Tool</small></div>';
+  $("logoSide").innerHTML=LOGO; $("logoTop").innerHTML=LOGO;
+
+  var svgMinus='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M5 11h14v2H5z"/></svg>';
+  var svgPlus='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>';
+
+  $("tog").innerHTML=CATS.map(function(k){
+    return '<label class="sw" style="--c:'+COL[k]+'"><input type="checkbox" id="svc'+k+'" checked><span class="t"></span>'+k+'</label>';
+  }).join("");
+  $("pkgRows").innerHTML=PACKAGES.map(function(p,i){
+    return '<div class="row"><strong>'+p+' Mbps</strong><div class="bar"><i id="pb'+p+'" style="background:'+PKGCOL[i]+'"></i></div>'+
+      '<div class="step"><button type="button" data-p="'+p+'" data-d="-1" aria-label="Decrease '+p+' Mbps users">'+svgMinus+'</button>'+
+      '<input id="u'+p+'" type="number" inputmode="numeric" min="0" step="1" value="0" aria-label="Users on '+p+' Mbps">'+
+      '<button type="button" data-p="'+p+'" data-d="1" aria-label="Increase '+p+' Mbps users">'+svgPlus+'</button></div></div>';
+  }).join("");
+  $("legend").innerHTML=CATS.map(function(k){return '<div style="--c:'+COL[k]+'"><span class="dot"></span>'+k+'</div>'}).join("");
+
+  function svc(k){var c=$("svc"+k);return c?c.checked:true}
+
+  function calc(){
+    var total=0, users={};
+    PACKAGES.forEach(function(p){users[p]=Math.max(0,n($("u"+p).value));total+=users[p]});
+    save();
+    var extra=Math.max(0,n($("extraPct").value)||0), mul=1+extra/100;
+    var need={}; CATS.forEach(function(k){need[k]=total*AVG[k]*mul});
+    var fb=0;
+    CATS.forEach(function(k){
+      if(!svc(k)){ if(FALLBACK[k]){fb+=need[k]} need[k]=0; }
+    });
+    if(!svc("IIG")){fb=0;need.IIG=0}else{need.IIG+=fb}
+    var sum=0; CATS.forEach(function(k){sum+=need[k]});
+
+    // results panel
+    $("resList").innerHTML=CATS.map(function(k){
+      var pct=sum>0?need[k]/sum*100:0;
+      return '<div class="res'+(svc(k)?'':' off')+'"><span class="n"><span class="dot" style="--c:'+COL[k]+'"></span>'+k+'</span>'+
+        '<span class="v">'+fmt(need[k])+' <small>Mbps</small></span><div class="bar"><i style="width:'+pct+'%;background:'+COL[k]+'"></i></div></div>';
+    }).join("");
+    $("rTotal").textContent=fmt(sum); $("sTotal").textContent=fmt(sum); $("dTotal").textContent=fmt(sum);
+    $("fallbackToIIG").textContent=fmt(fb); $("sFb").textContent=fmt(fb);
+    $("totalUsers").textContent=Math.round(total); $("sUsers").textContent=Math.round(total);
+
+    // stat rings
+    var onPkgs=PACKAGES.filter(function(p){return users[p]>0}).length;
+    $("ringU").setAttribute("stroke-dasharray",(onPkgs/PACKAGES.length*100)+" 100"); $("ringUt").textContent=onPkgs+"/"+PACKAGES.length;
+    var perUser=total>0?sum/total:0, maxPer=0; CATS.forEach(function(k){maxPer+=AVG[k]*mul});
+    var tp=maxPer>0?Math.min(100,perUser/maxPer*100):0;
+    $("ringT").setAttribute("stroke-dasharray",tp+" 100"); $("ringTt").textContent=Math.round(tp)+"%";
+    var fp=need.IIG>0?Math.min(100,fb/need.IIG*100):0;
+    $("ringF").setAttribute("stroke-dasharray",fp+" 100"); $("ringFt").textContent=Math.round(fp)+"%";
+
+    // package bars
+    PACKAGES.forEach(function(p){$("pb"+p).style.width=(total>0?users[p]/total*100:0)+"%"});
+
+    // donut
+    var C=2*Math.PI*48, off=0, g="";
+    if(sum>0) CATS.forEach(function(k){
+      var len=need[k]/sum*C; if(len<=0) return;
+      g+='<circle cx="60" cy="60" r="48" fill="none" stroke-width="14" stroke="'+COL[k]+'" stroke-dasharray="'+Math.max(0,len-1.5)+' '+C+'" stroke-dashoffset="'+(-off)+'"/>';
+      off+=len;
+    });
+    $("segs").innerHTML=g;
+  }
+
+  function save(){
+    try{
+      var s={users:{},services:{},extra:$("extraPct").value};
+      PACKAGES.forEach(function(p){s.users[p]=$("u"+p).value});
+      CATS.forEach(function(c){s.services[c]=svc(c)});
+      localStorage.setItem(KEY,JSON.stringify(s));
+    }catch(e){}
+  }
+  function load(){
+    try{
+      var raw=localStorage.getItem(KEY); if(!raw) return;
+      var s=JSON.parse(raw);
+      if(s.users) PACKAGES.forEach(function(p){if(s.users[p]!==undefined)$("u"+p).value=s.users[p]});
+      if(s.services) CATS.forEach(function(c){if(s.services[c]!==undefined)$("svc"+c).checked=s.services[c]});
+      if(s.extra) $("extraPct").value=s.extra;
+    }catch(e){}
+  }
+
+  var toastT;
+  function toast(m){var t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove("show")},2400)}
+
+  var armed=false, armT;
+  function resetAll(){
+    var b=$("btnReset");
+    if(!armed){armed=true;b.classList.remove("gho");b.classList.add("warn");b.querySelector("span").textContent="Tap again to confirm";
+      armT=setTimeout(disarm,3000);return}
+    disarm();
+    PACKAGES.forEach(function(p){$("u"+p).value=0});
+    CATS.forEach(function(c){$("svc"+c).checked=true});
+    $("extraPct").value="0";
+    try{localStorage.removeItem(KEY)}catch(e){}
+    calc(); toast("All data reset");
+  }
+  function disarm(){armed=false;clearTimeout(armT);var b=$("btnReset");b.classList.remove("warn");b.classList.add("gho");b.querySelector("span").textContent="Reset"}
+
+  function copyReport(){
+    var L=["--- Furqan Cloud · ISP Bandwidth Plan ---","Total Users: "+$("totalUsers").textContent,"Extra Buffer: "+($("extraPct").value||0)+"%","","REQUIRED:"];
+    CATS.forEach(function(k){L.push(k+": "+fmt(parseFloat((document.querySelectorAll("#resList .v")[CATS.indexOf(k)]||{}).textContent)||0)+" Mbps")});
+    L.push("--------------------------","TOTAL: "+$("rTotal").textContent+" Mbps","","© 2026 Furqan Cloud");
+    var text=L.join("\n");
+    function fallback(){
+      try{var ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();
+        var ok=document.execCommand("copy");document.body.removeChild(ta);toast(ok?"Report copied!":"Copy failed")}catch(e){toast("Copy failed")}
+    }
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){toast("Report copied!")},fallback)}else{fallback()}
+  }
+
+  document.addEventListener("click",function(e){
+    var b=e.target.closest("button"); if(!b) return;
+    if(b.dataset.p){var i=$("u"+b.dataset.p);i.value=Math.max(0,n(i.value)+n(b.dataset.d));calc()}
+    else if(b.dataset.b){var x=$("extraPct");x.value=Math.max(0,n(x.value)+n(b.dataset.b));calc()}
+    else if(b.dataset.go){
+      document.querySelectorAll(".nav button").forEach(function(o){o.classList.toggle("on",o===b)});
+      var t=b.dataset.go==="top"?$("top"):$(b.dataset.go);
+      t.scrollIntoView({behavior:window.matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth",block:"start"});
+    }
+  });
+  document.addEventListener("input",function(e){if(e.target.matches("input"))calc()});
+  document.addEventListener("focusin",function(e){if(e.target.matches('input[type="number"]'))e.target.select()});
+  $("btnReset").addEventListener("click",resetAll);
+  $("btnCopy").addEventListener("click",copyReport);
+
+  var root=document.documentElement;
+  var MOON='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg><span>Dark</span>';
+  var SUN='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9L7 7M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg><span>Light</span>';
+  function isDark(){var t=root.getAttribute("data-theme");return t?t==="dark":window.matchMedia("(prefers-color-scheme:dark)").matches}
+  function paintTheme(){var d=isDark();$("themeBtn").innerHTML=d?SUN:MOON;$("themeBtn").setAttribute("aria-label",d?"Switch to light mode":"Switch to dark mode")}
+  try{var st=localStorage.getItem(KEY+"Theme");if(st)root.setAttribute("data-theme",st)}catch(e){}
+  $("themeBtn").addEventListener("click",function(){var t=isDark()?"light":"dark";root.setAttribute("data-theme",t);try{localStorage.setItem(KEY+"Theme",t)}catch(e){}paintTheme()});
+  paintTheme();
+  load(); calc();
+})();
+</script>
+</body>
+</html>
